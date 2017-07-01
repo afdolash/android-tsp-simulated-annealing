@@ -4,6 +4,7 @@ package com.advinity.afdolash.gisku.fragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.advinity.afdolash.gisku.R;
+import com.advinity.afdolash.gisku.activity.MainActivity;
 import com.advinity.afdolash.gisku.sa.City;
 import com.advinity.afdolash.gisku.sa.Tour;
 import com.advinity.afdolash.gisku.sa.TourManager;
@@ -28,6 +30,7 @@ public class MenuFragment extends Fragment {
 
     private Button btn_solve, btn_reload, btn_detail, btn_random;
     private EditText et_temp, et_coolingRate, et_absZero, et_random, et_distance;
+    private ProgressDialog progressDialog;
 
     // Declaration simulated annealing variables
     double temp;
@@ -55,11 +58,20 @@ public class MenuFragment extends Fragment {
         et_random = (EditText) view.findViewById(R.id.et_random);
         et_temp = (EditText) view.findViewById(R.id.et_temp);
 
+        // Progress dialog
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setMessage("Find shortest distance...");
+
         // Widget event
         btn_solve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getFragmentManager().popBackStack();
+                // Status ready
+                boolean mStatus = false;
+
+                // Progress dialog
+                progressDialog.show();
 
                 // Initialize simulated annealing variables
                 temp = Double.parseDouble(et_temp.getText().toString());
@@ -69,9 +81,6 @@ public class MenuFragment extends Fragment {
                 //create random intial solution
                 Tour currentSolution = new Tour();
                 currentSolution.generateIndividual();
-
-//                System.out.println("Total distance of initial solution: " + currentSolution.getTotalDistance());
-//                System.out.println("Tour: " + currentSolution);
 
                 Toast.makeText(getActivity(), "Total distance : "+ currentSolution.getTotalDistance(), Toast.LENGTH_SHORT).show();
 
@@ -116,13 +125,16 @@ public class MenuFragment extends Fragment {
 
                     // Cool system
                     temp *= coolingRate;
-
-//                    System.out.println("Tour: " + best);
                 }
 
-//                System.out.println("Final solution distance: " + best.getTotalDistance());
-//                System.out.println("Tour: " + best);
-                Toast.makeText(getActivity(), "Final distance : "+ best.getTotalDistance(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Final distance : " + best.getTotalDistance(), Toast.LENGTH_SHORT).show();
+
+                progressDialog.hide();
+
+                ((MainActivity) getActivity()).getWaypoints(best);
+
+                getActivity().getFragmentManager().popBackStack();
+
             }
         });
 
