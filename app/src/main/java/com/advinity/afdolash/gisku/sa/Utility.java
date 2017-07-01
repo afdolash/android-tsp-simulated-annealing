@@ -16,7 +16,7 @@ public class Utility {
     public static double distance(City city1, City city2){
         double xDistance = Math.abs(city1.getX() - city2.getX());
         double yDistance = Math.abs(city1.getY() - city2.getY());
-        double distance = Math.sqrt( (xDistance*xDistance) + (yDistance*yDistance) );
+        double distance = Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
 
         return distance;
     }
@@ -28,7 +28,7 @@ public class Utility {
      * @param temperature the current temperature
      * @return value the probability of whether to accept the new tour
      */
-    public static double acceptanceProbability(int currentDistance, int newDistance, double temperature) {
+    public static double acceptanceProbability(double currentDistance, double newDistance, double temperature) {
         // If the new solution is better, accept it
         if (newDistance < currentDistance) {
             return 1.0;
@@ -42,7 +42,7 @@ public class Utility {
      * 0.0 <= n <= 1.0
      * @return random such that 0.0 <= random <= 1.0
      */
-    static double randomDouble()
+    public static double randomDouble()
     {
         Random r = new Random();
         return r.nextInt(1000) / 1000.0;

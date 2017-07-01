@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.advinity.afdolash.gisku.fragment.MenuFragment;
 import com.advinity.afdolash.gisku.R;
@@ -24,15 +25,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
+import static com.advinity.afdolash.gisku.sa.TourManager.numberOfCities;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     ImageView btn_menu;
     GoogleMap mMap;
-
-    // Set simulated annealing variables
-    double temp = 0.1;
-    double coolingRate = 0.99;
-    double absoluteZero = 0.01;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 mMap.addMarker(new MarkerOptions().position(point));
 
                 TourManager.addCity(new City(point.latitude, point.longitude));
+                Toast.makeText(MainActivity.this, ""+ numberOfCities(), Toast.LENGTH_SHORT).show();
             }
         });
     }

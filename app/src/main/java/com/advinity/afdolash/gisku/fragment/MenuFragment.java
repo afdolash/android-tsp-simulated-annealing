@@ -4,13 +4,21 @@ package com.advinity.afdolash.gisku.fragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.advinity.afdolash.gisku.R;
+import com.advinity.afdolash.gisku.sa.City;
+import com.advinity.afdolash.gisku.sa.Tour;
+import com.advinity.afdolash.gisku.sa.TourManager;
+import com.advinity.afdolash.gisku.sa.Utility;
 
 
 /**
@@ -18,7 +26,13 @@ import com.advinity.afdolash.gisku.R;
  */
 public class MenuFragment extends Fragment {
 
-    private Button btn_solve;
+    private Button btn_solve, btn_reload, btn_detail, btn_random;
+    private EditText et_temp, et_coolingRate, et_absZero, et_random, et_distance;
+
+    // Declaration simulated annealing variables
+    double temp;
+    double coolingRate;
+    double absoluteZero;
 
     public MenuFragment() {
         // Required empty public constructor
@@ -31,12 +45,84 @@ public class MenuFragment extends Fragment {
 
         // Initialize widget
         btn_solve = (Button) view.findViewById(R.id.btn_solve);
+        btn_reload = (Button) view.findViewById(R.id.btn_reload);
+        btn_detail = (Button) view.findViewById(R.id.btn_detail);
+        btn_random = (Button) view.findViewById(R.id.btn_random);
+
+        et_absZero = (EditText) view.findViewById(R.id.et_abszero);
+        et_coolingRate = (EditText) view.findViewById(R.id.et_coolrate);
+        et_distance = (EditText) view.findViewById(R.id.et_distance);
+        et_random = (EditText) view.findViewById(R.id.et_random);
+        et_temp = (EditText) view.findViewById(R.id.et_temp);
 
         // Widget event
         btn_solve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getActivity().getFragmentManager().popBackStack();
+
+                // Initialize simulated annealing variables
+                temp = Double.parseDouble(et_temp.getText().toString());
+                coolingRate = Double.parseDouble(et_coolingRate.getText().toString());
+                absoluteZero = Double.parseDouble(et_absZero.getText().toString());
+
+                //create random intial solution
+                Tour currentSolution = new Tour();
+                currentSolution.generateIndividual();
+
+//                System.out.println("Total distance of initial solution: " + currentSolution.getTotalDistance());
+//                System.out.println("Tour: " + currentSolution);
+
+                Toast.makeText(getActivity(), "Total distance : "+ currentSolution.getTotalDistance(), Toast.LENGTH_SHORT).show();
+
+                // We would like to keep track if the best solution
+                // Assume best solution is the current solution
+                Tour best = new Tour(currentSolution.getTour());
+
+                // Loop until system has cooled
+                while (temp > absoluteZero) {
+                    // Create new neighbour tour
+                    Tour newSolution = new Tour(currentSolution.getTour());
+
+                    // Get random positions in the tour
+                    int tourPos1 = Utility.randomInt(0 , newSolution.tourSize());
+                    int tourPos2 = Utility.randomInt(0 , newSolution.tourSize());
+
+                    //to make sure that tourPos1 and tourPos2 are different
+                    while(tourPos1 == tourPos2) {tourPos2 = Utility.randomInt(0 , newSolution.tourSize());}
+
+                    // Get the cities at selected positions in the tour
+                    City citySwap1 = newSolution.getCity(tourPos1);
+                    City citySwap2 = newSolution.getCity(tourPos2);
+
+                    // Swap them
+                    newSolution.setCity(tourPos2, citySwap1);
+                    newSolution.setCity(tourPos1, citySwap2);
+
+                    // Get energy of solutions
+                    double currentDistance   = currentSolution.getTotalDistance();
+                    double neighbourDistance = newSolution.getTotalDistance();
+
+                    // Decide if we should accept the neighbour
+                    double rand = Utility.randomDouble();
+                    if (Utility.acceptanceProbability(currentDistance, neighbourDistance, temp) > rand) {
+                        currentSolution = new Tour(newSolution.getTour());
+                    }
+
+                    // Keep track of the best solution found
+                    if (currentSolution.getTotalDistance() < best.getTotalDistance()) {
+                        best = new Tour(currentSolution.getTour());
+                    }
+
+                    // Cool system
+                    temp *= coolingRate;
+
+//                    System.out.println("Tour: " + best);
+                }
+
+//                System.out.println("Final solution distance: " + best.getTotalDistance());
+//                System.out.println("Tour: " + best);
+                Toast.makeText(getActivity(), "Final distance : "+ best.getTotalDistance(), Toast.LENGTH_SHORT).show();
             }
         });
 

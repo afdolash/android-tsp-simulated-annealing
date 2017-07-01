@@ -1,5 +1,7 @@
 package com.advinity.afdolash.gisku.sa;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -13,7 +15,10 @@ public class Tour{
     private ArrayList<City> tour = new ArrayList<City>();
 
     //we assume initial value of distance is 0
-    private int distance = 0;
+    private double distance = 0;
+
+    //array to save waypoints
+    public double[][] waypoints;
 
     //Constructor
     //starts an empty tour
@@ -74,19 +79,19 @@ public class Tour{
      * Computes and returns the total distance of the tour
      * @return distance total distance of the tour
      */
-    public int getTotalDistance(){
+    public double getTotalDistance(){
         if (distance == 0) {
-            int tourDistance = 0;
+            double tourDistance = 0;
             // Loop through our tour's cities
-            for (int cityIndex=0; cityIndex < tourSize(); cityIndex++) {
+            for (int cityIndex = 0; cityIndex < tourSize(); cityIndex++) {
                 // Get city we're traveling from
                 City fromCity = getCity(cityIndex);
                 // City we're traveling to
                 City destinationCity;
                 // Check we're not on our tour's last city, if we are set our
                 // tour's final destination city to our starting city
-                if(cityIndex+1 < tourSize()){
-                    destinationCity = getCity(cityIndex+1);
+                if(cityIndex + 1 < tourSize()){
+                    destinationCity = getCity(cityIndex + 1);
                 }
                 else{
                     destinationCity = getCity(0);
@@ -106,4 +111,28 @@ public class Tour{
     public int tourSize() {
         return tour.size();
     }
+
+    /**
+     * Get number of waypoints on our tour
+     * @return how many waypoints to destination point
+     */
+    public double[][] getWaypoints() {
+        for (int i = 0; i < tourSize(); i++) {
+            waypoints[i][0] = getCity(i).getX();
+            waypoints[i][1] = getCity(i).getY();
+        }
+        return waypoints;
+    }
+
+//    @Override
+//    /**
+//     * To print out a list of all the cities in the tour
+//     */
+//    public String toString() {
+//        String s = getCity(0).getCityName();
+//        for (int i = 1; i < tourSize(); i++) {
+//            s += " -> " + getCity(i).getCityName();
+//        }
+//        return s;
+//    }
 }

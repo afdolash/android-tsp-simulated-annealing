@@ -73,8 +73,8 @@ public class SimulatedAnnealing {
             newSolution.setCity(tourPos1, citySwap2);
 
             // Get energy of solutions
-            int currentDistance   = currentSolution.getTotalDistance();
-            int neighbourDistance = newSolution.getTotalDistance();
+            double currentDistance   = currentSolution.getTotalDistance();
+            double neighbourDistance = newSolution.getTotalDistance();
 
             // Decide if we should accept the neighbour
             double rand = Utility.randomDouble();
@@ -89,6 +89,8 @@ public class SimulatedAnnealing {
 
             // Cool system
             temp *= 1 - coolingRate;
+
+            System.out.println("Tour: " + best);
         }
 
         System.out.println("Final solution distance: " + best.getTotalDistance());
