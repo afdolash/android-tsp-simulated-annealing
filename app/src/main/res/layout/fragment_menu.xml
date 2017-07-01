@@ -2,18 +2,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="24dp"
-    android:paddingRight="24dp"
-    android:paddingTop="24dp"
-    android:paddingBottom="24dp"
-    android:background="#e6ffffff"
-    android:scrollbars="none"
-    tools:context="com.advinity.afdolash.gisku.MenuFragment">
+    tools:context="com.advinity.afdolash.gisku.fragment.MenuFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp"
+        android:background="#e6ffffff">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -63,6 +62,7 @@
             android:textColorHint="#212121">
 
             <EditText
+                android:id="@+id/et_distance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.00 km"
@@ -79,6 +79,7 @@
             android:textColorHint="#212121">
 
             <EditText
+                android:id="@+id/et_temp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.1"/>
@@ -93,6 +94,7 @@
             android:textColorHint="#212121">
 
             <EditText
+                android:id="@+id/et_abszero"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.01"/>
@@ -107,6 +109,7 @@
             android:textColorHint="#212121">
 
             <EditText
+                android:id="@+id/et_coolrate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="0.99"/>
@@ -121,6 +124,7 @@
             android:textColorHint="#212121">
 
             <EditText
+                android:id="@+id/et_random"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="5"/>
@@ -128,6 +132,7 @@
         </android.support.design.widget.TextInputLayout>
         
         <Button
+            android:id="@+id/btn_random"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="RANDOM"
@@ -135,6 +140,7 @@
             android:backgroundTint="@color/colorAccent"/>
 
         <Button
+            android:id="@+id/btn_detail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="DETAIL DISTANCE"
@@ -148,6 +154,7 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btn_reload"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -156,6 +163,7 @@
                 android:backgroundTint="@color/colorPrimary"/>
 
             <Button
+                android:id="@+id/btn_solve"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
