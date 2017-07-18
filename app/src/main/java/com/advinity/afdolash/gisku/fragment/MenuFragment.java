@@ -67,6 +67,22 @@ public class MenuFragment extends Fragment {
         progressDialog.setMessage("Find shortest distance...");
 
         // Widget event
+        btn_random.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int countRandom = Integer.parseInt(et_random.getText().toString());
+
+                if (countRandom > 9 || (TourManager.numberOfCities() + countRandom) > 9) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Cant load more than 9 points", Toast.LENGTH_SHORT);
+                    return;
+                } else {
+                    ((MainActivity) getActivity()).getRandomLocation(Integer.parseInt(et_random.getText().toString()));
+
+                    getActivity().getFragmentManager().popBackStack();
+                }
+            }
+        });
+
         btn_reload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,7 +98,10 @@ public class MenuFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (TourManager.numberOfCities() < 3) {
-                    Toast.makeText(getActivity().getApplicationContext(), "Set minimum 3 marker", Toast.LENGTH_SHORT);
+                    Toast.makeText(getActivity().getApplicationContext(), "Set minimum 3 points", Toast.LENGTH_SHORT);
+                    return;
+                } else if (TourManager.numberOfCities() > 9) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Cant load more than 9 points", Toast.LENGTH_SHORT);
                     return;
                 }
 

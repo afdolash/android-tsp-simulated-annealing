@@ -5,10 +5,13 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -39,6 +42,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -52,6 +56,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Making notification bar transparent
+        if (Build.VERSION.SDK_INT >= 21) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+
+        changeStatusBarColor();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -108,22 +119,68 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng point) {
-                TourManager.addCity(new City(point.latitude, point.longitude));
-
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(point);
-
-                if (TourManager.numberOfCities() == 1) {
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                if (TourManager.numberOfCities() >= 9) {
+                    Toast.makeText(MainActivity.this, "Cant load more than 9 points", Toast.LENGTH_SHORT).show();
+                    return;
                 } else {
-                    markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-                }
+                    TourManager.addCity(new City(point.latitude, point.longitude));
 
-                mMap.addMarker(markerOptions);
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(point);
+
+                    if (TourManager.numberOfCities() == 1) {
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                    } else {
+                        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                    }
+
+                    mMap.addMarker(markerOptions);
+                }
             }
         });
     }
 
+    // Event if button RANDOM has been clicked
+    public void getRandomLocation(Integer countRandom) {
+        // Location default
+        double x0 = -7.257931;
+        double y0 = 112.757346;
+
+        for (int i = 0; i < countRandom; i++) {
+            Random random = new Random();
+
+            // Convert radius from 10 meters to degrees
+            double radiusInDegrees = 5000 / 111000f;
+
+            double u = random.nextDouble();
+            double v = random.nextDouble();
+            double w = radiusInDegrees * Math.sqrt(u);
+            double t = 2 * Math.PI * v;
+            double x = w * Math.cos(t);
+            double y = w * Math.sin(t);
+
+            // Adjust the x-coordinate for shrinking of the east-west distances
+            double new_x = x / Math.cos(y0);
+
+            double foundLatitude = new_x + x0;
+            double foundLongitude = y + y0;
+
+            TourManager.addCity(new City(foundLatitude, foundLongitude));
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(new LatLng(foundLatitude, foundLongitude));
+
+            if (TourManager.numberOfCities() == 1) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            } else {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+            }
+
+            mMap.addMarker(markerOptions);
+        }
+    }
+
+    // Event if button SOLVED has been clicked
     public void getWaypoints(Tour best) {
         progressDialog.show();
 
@@ -131,9 +188,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             LatLng latLng = new LatLng(best.getCity(i).getX(), best.getCity(i).getY());
             markerPoints.add(latLng);
         }
-
-//        LatLng end = new LatLng(best.getCity(0).getX(), best.getCity(0).getY());
-//        markerPoints.add(end);
 
         // Get direction
         LatLng origin = (LatLng) markerPoints.get(0);
@@ -182,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    /** A class to parse the Google Places in JSON format */
+    // A class to parse the Google Places in JSON format
     private class ParserTask extends AsyncTask<String, Integer, List<List<HashMap<String,String>>> >{
 
         // Parsing the data in non-ui thread
@@ -242,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    // Set uri/url direction
     private String getDirectionsUrl(LatLng origin,LatLng dest){
 
         // Origin of route
@@ -274,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return url;
     }
 
-    /** A method to download json data from url */
+    // A method to download json data from url
     private String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
@@ -311,5 +366,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             urlConnection.disconnect();
         }
         return data;
+    }
+
+    /**
+     * Making notification bar transparent
+     */
+    private void changeStatusBarColor() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        }
     }
 }
