@@ -21,6 +21,9 @@ import com.advinity.afdolash.gisku.sa.City;
 import com.advinity.afdolash.gisku.sa.Tour;
 import com.advinity.afdolash.gisku.sa.TourManager;
 import com.advinity.afdolash.gisku.sa.Utility;
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 
 
 /**
@@ -64,11 +67,24 @@ public class MenuFragment extends Fragment {
         progressDialog.setMessage("Find shortest distance...");
 
         // Widget event
+        btn_reload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).markerPoints = new ArrayList<LatLng>();
+                ((MainActivity) getActivity()).mMap.clear();
+                TourManager.clearTour();
+
+                getActivity().getFragmentManager().popBackStack();
+            }
+        });
+
         btn_solve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Status ready
-                boolean mStatus = false;
+                if (TourManager.numberOfCities() < 3) {
+                    Toast.makeText(getActivity().getApplicationContext(), "Set minimum 3 marker", Toast.LENGTH_SHORT);
+                    return;
+                }
 
                 // Progress dialog
                 progressDialog.show();
