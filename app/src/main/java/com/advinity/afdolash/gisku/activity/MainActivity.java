@@ -18,9 +18,11 @@ import android.widget.Toast;
 import com.advinity.afdolash.gisku.api.DirectionsJSONParser;
 import com.advinity.afdolash.gisku.fragment.MenuFragment;
 import com.advinity.afdolash.gisku.R;
+import com.advinity.afdolash.gisku.modal.Detail;
 import com.advinity.afdolash.gisku.sa.City;
 import com.advinity.afdolash.gisku.sa.Tour;
 import com.advinity.afdolash.gisku.sa.TourManager;
+import com.advinity.afdolash.gisku.sa.Utility;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     ProgressDialog progressDialog;
 
     public List<LatLng> markerPoints = new ArrayList<>();
+    public List<LatLng> defaultPoints = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Google maps ui settings
         mMap.getUiSettings().setCompassEnabled(true);
+        mMap.setBuildingsEnabled(true);
 
         // Add a marker in Sydney and move the camera
         LatLng mLatLng = new LatLng(-7.257931, 112.757346);
@@ -127,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(point);
+                    markerOptions.title("City "+ (TourManager.numberOfCities() - 1));
 
                     if (TourManager.numberOfCities() == 1) {
                         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
@@ -135,9 +140,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
 
                     mMap.addMarker(markerOptions);
+                    defaultPoints.add(point);
                 }
             }
         });
+    }
+
+    // Event if button DETAIL has been clicked
+    public void getDetail() {
+        List<Detail> dataDetail = new ArrayList<>();
+
+        for (int i = 0; i < defaultPoints.size(); i++) {
+            for (int j = 0; j < markerPoints.size(); j++) {
+                if (defaultPoints.get(i).equals(markerPoints.get(j))) {
+                    dataDetail.add(new Detail(
+                            "City " + i,
+                            markerPoints.get(j)
+                    ));
+
+                    break;
+                }
+            }
+        }
+
+        for (int i = 0; i < dataDetail.size(); i++) {
+            try {
+                double distance = Utility.distance(
+                        new City(dataDetail.get(i).getLatLng().latitude, dataDetail.get(i).getLatLng().longitude),
+                        new City(dataDetail.get(i + 1).getLatLng().latitude, dataDetail.get(i + 1).getLatLng().longitude)
+                );
+
+                Toast.makeText(MainActivity.this, dataDetail.get(i).getName() +" to "+ dataDetail.get(i + 1).getName() +" - "+ distance, Toast.LENGTH_SHORT).show();
+
+            } catch (Exception e) {
+                double distance = Utility.distance(
+                        new City(dataDetail.get(i).getLatLng().latitude, dataDetail.get(i).getLatLng().longitude),
+                        new City(dataDetail.get(0).getLatLng().latitude, dataDetail.get(0).getLatLng().longitude)
+                );
+
+                Toast.makeText(MainActivity.this, dataDetail.get(i).getName() +" to "+ dataDetail.get(0).getName() +" - "+ distance, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        dataDetail.clear();
     }
 
     // Event if button RANDOM has been clicked
@@ -169,6 +214,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(new LatLng(foundLatitude, foundLongitude));
+            markerOptions.title("City "+ (TourManager.numberOfCities() - 1));
 
             if (TourManager.numberOfCities() == 1) {
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
@@ -177,6 +223,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
 
             mMap.addMarker(markerOptions);
+            defaultPoints.add(new LatLng(foundLatitude, foundLongitude));
         }
     }
 

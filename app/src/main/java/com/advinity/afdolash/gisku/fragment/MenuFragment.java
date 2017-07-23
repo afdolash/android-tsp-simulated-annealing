@@ -67,6 +67,15 @@ public class MenuFragment extends Fragment {
         progressDialog.setMessage("Find shortest distance...");
 
         // Widget event
+        btn_detail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).getDetail();
+
+                getActivity().getFragmentManager().popBackStack();
+            }
+        });
+
         btn_random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,6 +96,7 @@ public class MenuFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 ((MainActivity) getActivity()).markerPoints = new ArrayList<LatLng>();
+                ((MainActivity) getActivity()).defaultPoints = new ArrayList<LatLng>();
                 ((MainActivity) getActivity()).mMap.clear();
                 TourManager.clearTour();
 
@@ -117,7 +127,7 @@ public class MenuFragment extends Fragment {
                 Tour currentSolution = new Tour();
                 currentSolution.generateIndividual();
 
-                Toast.makeText(getActivity(), "Total distance : "+ currentSolution.getTotalDistance(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Initialize distance : "+ currentSolution.getTotalDistance(), Toast.LENGTH_LONG).show();
 
                 // We would like to keep track if the best solution
                 // Assume best solution is the current solution
@@ -162,7 +172,7 @@ public class MenuFragment extends Fragment {
                     temp *= coolingRate;
                 }
 
-                Toast.makeText(getActivity(), "Final distance : " + best.getTotalDistance(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Final distance : " + best.getTotalDistance(), Toast.LENGTH_LONG).show();
 
                 progressDialog.hide();
 
